@@ -154,13 +154,13 @@ jobs:
           # Strategy 1: Check for JSON metadata file from wrangler
           if [ -f ".wrangler/deploy.json" ]; then
             echo "::notice::Found wrangler deployment metadata"
-            DEPLOYED_URL=$(cat .wrangler/deploy.json | grep -oP '"url"\s*:\s*"\K[^"]+' | head -1 || echo "")
+            DEPLOYED_URL=$(cat .wrangler/deploy.json | grep -oP '"url"\\s*:\\s*"\\K[^"]+' | head -1 || echo "")
           fi
           
           # Strategy 2: Parse from deployment log output (fallback)
           if [ -z "$DEPLOYED_URL" ]; then
             echo "::notice::Extracting URL from deployment logs"
-            DEPLOYED_URL=$(grep -oP "https://[a-zA-Z0-9.-]+\\.workers\\.dev" deploy.log | head -1 || echo "")
+            DEPLOYED_URL=$(grep -oP "https://[a-zA-Z0-9.-]+\\\\.workers\\\\.dev" deploy.log | head -1 || echo "")
           fi
           
           # Strategy 3: Construct URL from worker name (last resort)
@@ -181,7 +181,7 @@ jobs:
       - name: Update Deployment URL in Flowglass
         if: steps.deploy.outputs.url != ''
         run: |
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.FLOWGLASS_API_URL || 'https://ycojnfmwmmeanstlqfes.supabase.co' }}/functions/v1/update-deployment-url" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.FLOWGLASS_API_KEY }}" -d "{\"projectId\":\"a8616867-6a93-4e9b-84f5-106e95767487\",\"deploymentUrl\":\"${{ steps.deploy.outputs.url }}\",\"deploymentTarget\":\"cloudflare\",\"metadata\":{\"workflow_run_id\":\"${{ github.run_id }}\",\"workflow_run_number\":\"${{ github.run_number }}\",\"commit_sha\":\"${{ github.sha }}\",\"environment\":\"${{ env.DEPLOY_ENVIRONMENT }}\",\"worker_name\":\"Test1024\"}}")
+          RESPONSE=$(curl -s -w "\\n%{http_code}" -X POST "${{ secrets.FLOWGLASS_API_URL || 'https://ycojnfmwmmeanstlqfes.supabase.co' }}/functions/v1/update-deployment-url" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.FLOWGLASS_API_KEY }}" -d "{\\"projectId\\":\\"a8616867-6a93-4e9b-84f5-106e95767487\\",\\"deploymentUrl\\":\\"${{ steps.deploy.outputs.url }}\\",\\"deploymentTarget\\":\\"cloudflare\\",\\"metadata\\":{\\"workflow_run_id\\":\\"${{ github.run_id }}\\",\\"workflow_run_number\\":\\"${{ github.run_number }}\\",\\"commit_sha\\":\\"${{ github.sha }}\\",\\"environment\\":\\"${{ env.DEPLOY_ENVIRONMENT }}\\",\\"worker_name\\":\\"Test1024\\"}}")
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | head -n-1)
           echo "Response: $BODY"
