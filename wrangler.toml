@@ -1,0 +1,27 @@
+name = "Test1024"
+main = "src/index.js"
+compatibility_date = "2025-10-24"
+
+# Account ID - uses CLOUDFLARE_ACCOUNT_ID from GitHub secrets by default
+account_id = "6ec57290cbb52c27cda0bd089bae05a0"
+
+# Optional configuration:
+# workers_dev = true
+# route = "example.com/*"
+# zone_id = "<your-zone-id>"
+
+[env.preview]
+name = "Test1024-preview"
+
+# Add bindings as needed:
+# [[kv_namespaces]]
+# binding = "MY_KV"
+# id = "<kv-namespace-id>"
+
+# [[d1_databases]]
+# binding = "MY_DB"
+# database_id = "<d1-database-id>"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "<r2-bucket-name>"
